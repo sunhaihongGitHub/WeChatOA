@@ -1,4 +1,4 @@
-from PIL import Image, ImageFont, ImageDraw
+from PIL import Image, ImageFont, ImageDraw, ImageOps
 import os
 import math
 
@@ -33,6 +33,18 @@ def add_text2img(img, text, font= font):
     img_draw.text(text_xy, text, font= font, fill="red")
 
 
+def create_img(img):
+    size = (min(img.size), min(img.size))
+    mask = Image.new("L", size, 255)
+    draw = ImageDraw.Draw(mask)
+    draw.ellipse((0, 0) + size, fill = 0)
+    output = ImageOps.fit(img, mask.size, centering=(0.5, 0.5))
+    output.paste(0, mask = mask)
+    output.convert("P", palette=Image.ADAPTIVE)
+    output.save("output.jpg")
+
+
+
 
 def in_center(center_x, center_y, r, x, y):
     return math.pow(math.pow(math.fabs(center_x - x), 2) + math.pow(math.fabs(center_y - y), 2), 0.5) < r
@@ -44,13 +56,13 @@ if __name__ == '__main__':
     # im = im.rotate(45)#.show()
     print(im.size)
 
-
+    create_img(im)
 
 
     font_path = os.path.join(pro_path, "/fonts/Ubuntu-C.ttf")
     font = ImageFont.truetype(font_path, 80)
-    add_text2img(im, "sunhaihong", font)
+    # add_text2img(im, "sunhaihong", font)
     # im.show()
     # im.rotate(-45).show()
-    im.save("circle7.jpg")
+    # im.save("circle7.jpg")
     # im.rotate(135).show()
